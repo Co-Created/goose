@@ -2,7 +2,11 @@ import { act, render, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { IntlTestWrapper } from '../../../i18n/test-utils';
 import McpAppRenderer from '../McpAppRenderer';
-import { SPLIT_WIDTH_VARIABLE, clearSplitRightWidthStore } from '../SplitRightPanel';
+import {
+  SPLIT_WIDTH_VARIABLE,
+  clearSplitRightWidthStore,
+  resetSplitHostWarning,
+} from '../SplitRightPanel';
 import type { GooseDisplayMode } from '../types';
 
 vi.mock('@mcp-ui/client', () => ({
@@ -38,6 +42,7 @@ describe('McpAppRenderer display modes', () => {
 
   beforeEach(() => {
     clearSplitRightWidthStore();
+    resetSplitHostWarning();
     electron.getAcpUrl = vi.fn(async () => 'ws://127.0.0.1:3000/acp');
     electron.getSecretKey = vi.fn(async () => 'secret');
     window.matchMedia = vi
@@ -88,7 +93,8 @@ describe('McpAppRenderer display modes', () => {
   }
 
   it('keeps the same iframe attached through inline, pip, split-right and fullscreen', async () => {
-    const { container, rerender } = render(renderApp('inline'), { wrapper: IntlTestWrapper });
+    const inHost = (mode: GooseDisplayMode) => <div data-mcp-split-host>{renderApp(mode)}</div>;
+    const { container, rerender } = render(inHost('inline'), { wrapper: IntlTestWrapper });
     const iframe = await waitFor(() => {
       const el = container.querySelector('iframe');
       expect(el).not.toBeNull();
@@ -113,9 +119,11 @@ describe('McpAppRenderer display modes', () => {
       'split-right',
       'inline',
     ] as const) {
-      rerender(renderApp(mode));
+      rerender(inHost(mode));
       expect(container.querySelector('iframe')).toBe(iframe);
       expect(iframe.isConnected).toBe(true);
+      // split-right really docks here (a resize handle appears); the shell restyles without remounting.
+      expect(container.querySelector('[role="separator"]') !== null).toBe(mode === 'split-right');
     }
 
     observer.takeRecords().forEach((record) => removals.push(...Array.from(record.removedNodes)));

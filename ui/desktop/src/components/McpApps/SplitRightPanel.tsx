@@ -61,6 +61,11 @@ export function clampSplitRightWidth(width: number, viewportWidth: number): numb
 
 let warnedNoSplitHost = false;
 
+/** Test hook: forget that the missing-host warning has been shown. */
+export function resetSplitHostWarning(): void {
+  warnedNoSplitHost = false;
+}
+
 /**
  * The host the panel docks to, or null when `el` has none. Without a host there is
  * nowhere to reserve room, so callers stay inline instead of entering split-right.

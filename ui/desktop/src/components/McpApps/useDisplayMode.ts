@@ -212,7 +212,7 @@ export function useDisplayMode({
         if (allowed.includes(requested)) {
           changeDisplayMode(requested);
         }
-        data.params.mode = toSpecDisplayMode(requested);
+        if (requested === 'split-right') data.params.mode = toSpecDisplayMode(requested);
       }
     };
 
