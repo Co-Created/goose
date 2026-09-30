@@ -1974,19 +1974,19 @@
     "defaultMessage": "Ridimensiona la finestra Picture-in-Picture"
   },
   "mcpAppRenderer.backToInline": {
-    "defaultMessage": "Back to conversation"
+    "defaultMessage": "Torna alla conversazione"
   },
   "mcpAppRenderer.openInSplitRight": {
-    "defaultMessage": "Open in side panel"
+    "defaultMessage": "Apri nel pannello laterale"
   },
   "mcpAppRenderer.resizeSplitPanel": {
-    "defaultMessage": "Resize side panel"
+    "defaultMessage": "Ridimensiona il pannello laterale"
   },
   "mcpAppRenderer.showInline": {
-    "defaultMessage": "Show here"
+    "defaultMessage": "Mostra qui"
   },
   "mcpAppRenderer.showingInSplitRight": {
-    "defaultMessage": "Showing in side panel"
+    "defaultMessage": "Visualizzato nel pannello laterale"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# elemento trovato} other{# elementi trovati}}"

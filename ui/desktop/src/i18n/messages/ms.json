@@ -1974,19 +1974,19 @@
     "defaultMessage": "Ubah saiz tetingkap Gambar-dalam-Gambar"
   },
   "mcpAppRenderer.backToInline": {
-    "defaultMessage": "Back to conversation"
+    "defaultMessage": "Kembali ke perbualan"
   },
   "mcpAppRenderer.openInSplitRight": {
-    "defaultMessage": "Open in side panel"
+    "defaultMessage": "Buka dalam panel sisi"
   },
   "mcpAppRenderer.resizeSplitPanel": {
-    "defaultMessage": "Resize side panel"
+    "defaultMessage": "Ubah saiz panel sisi"
   },
   "mcpAppRenderer.showInline": {
-    "defaultMessage": "Show here"
+    "defaultMessage": "Tunjukkan di sini"
   },
   "mcpAppRenderer.showingInSplitRight": {
-    "defaultMessage": "Showing in side panel"
+    "defaultMessage": "Dipaparkan dalam panel sisi"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# item dijumpai} other{# item dijumpai}}"
