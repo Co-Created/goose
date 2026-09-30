@@ -64,7 +64,7 @@ describe('McpAppRenderer display modes', () => {
     );
   }
 
-  it('keeps the same iframe attached through inline, pip and fullscreen', async () => {
+  it('keeps the same iframe attached through inline, pip, split-right and fullscreen', async () => {
     const { container, rerender } = render(renderApp('inline'), { wrapper: IntlTestWrapper });
     const iframe = await waitFor(() => {
       const el = container.querySelector('iframe');
@@ -80,7 +80,16 @@ describe('McpAppRenderer display modes', () => {
     });
     observer.observe(container, { childList: true, subtree: true });
 
-    for (const mode of ['pip', 'fullscreen', 'inline', 'fullscreen', 'pip', 'inline'] as const) {
+    for (const mode of [
+      'pip',
+      'fullscreen',
+      'inline',
+      'split-right',
+      'fullscreen',
+      'pip',
+      'split-right',
+      'inline',
+    ] as const) {
       rerender(renderApp(mode));
       expect(container.querySelector('iframe')).toBe(iframe);
       expect(iframe.isConnected).toBe(true);

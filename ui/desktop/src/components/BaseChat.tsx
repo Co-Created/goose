@@ -489,7 +489,10 @@ export default function BaseChat({
   }
 
   return (
-    <div className="h-full flex flex-col min-h-0">
+    <div
+      data-mcp-split-host
+      className="h-full flex flex-col min-h-0 pr-[var(--mcp-split-right-width,0px)]"
+    >
       <MainPanelLayout
         backgroundColor={'bg-background-primary'}
         removeTopPadding={true}

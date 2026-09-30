@@ -1973,6 +1973,21 @@
   "mcpAppRenderer.resizePipWindow": {
     "defaultMessage": "Thay đổi kích cỡ cửa sổ Hình-trong-hình"
   },
+  "mcpAppRenderer.backToInline": {
+    "defaultMessage": "Quay lại cuộc trò chuyện"
+  },
+  "mcpAppRenderer.openInSplitRight": {
+    "defaultMessage": "Mở trong bảng bên"
+  },
+  "mcpAppRenderer.resizeSplitPanel": {
+    "defaultMessage": "Đổi kích thước bảng bên"
+  },
+  "mcpAppRenderer.showInline": {
+    "defaultMessage": "Hiển thị tại đây"
+  },
+  "mcpAppRenderer.showingInSplitRight": {
+    "defaultMessage": "Đang hiển thị trong bảng bên"
+  },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# mục được tìm thấy} other{# mục được tìm thấy}}"
   },

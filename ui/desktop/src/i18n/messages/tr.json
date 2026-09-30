@@ -1973,6 +1973,21 @@
   "mcpAppRenderer.resizePipWindow": {
     "defaultMessage": "Resim İçinde Resim penceresini yeniden boyutlandırın"
   },
+  "mcpAppRenderer.backToInline": {
+    "defaultMessage": "Sohbete dön"
+  },
+  "mcpAppRenderer.openInSplitRight": {
+    "defaultMessage": "Yan panelde aç"
+  },
+  "mcpAppRenderer.resizeSplitPanel": {
+    "defaultMessage": "Yan paneli yeniden boyutlandır"
+  },
+  "mcpAppRenderer.showInline": {
+    "defaultMessage": "Burada göster"
+  },
+  "mcpAppRenderer.showingInSplitRight": {
+    "defaultMessage": "Yan panelde gösteriliyor"
+  },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# öğe bulundu} other{# öğe bulundu}}"
   },

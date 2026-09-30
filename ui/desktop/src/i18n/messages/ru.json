@@ -1973,6 +1973,21 @@
   "mcpAppRenderer.resizePipWindow": {
     "defaultMessage": "Изменить размер окна «картинка в картинке»"
   },
+  "mcpAppRenderer.backToInline": {
+    "defaultMessage": "Вернуться к беседе"
+  },
+  "mcpAppRenderer.openInSplitRight": {
+    "defaultMessage": "Открыть на боковой панели"
+  },
+  "mcpAppRenderer.resizeSplitPanel": {
+    "defaultMessage": "Изменить размер боковой панели"
+  },
+  "mcpAppRenderer.showInline": {
+    "defaultMessage": "Показать здесь"
+  },
+  "mcpAppRenderer.showingInSplitRight": {
+    "defaultMessage": "Показано на боковой панели"
+  },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count, plural, one {Найден # элемент} few {Найдено # элемента} many {Найдено # элементов} other {Найдено # элемента}}"
   },

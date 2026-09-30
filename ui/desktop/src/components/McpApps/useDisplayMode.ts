@@ -4,7 +4,7 @@
  * Encapsulates the display mode state machine, capability negotiation,
  * entrance animations, and postMessage interception for ui/initialize and
  * ui/request-display-mode. Mode-specific chrome and geometry live with each
- * mode's component (see PipWindow.tsx).
+ * mode's component (see PipWindow.tsx and SplitRightPanel.tsx).
  */
 
 import type { McpUiDisplayMode } from '@modelcontextprotocol/ext-apps/app-bridge';
@@ -13,7 +13,13 @@ import type { GooseDisplayMode, OnDisplayModeChange } from './types';
 
 const DEFAULT_IFRAME_HEIGHT = 200;
 
-const AVAILABLE_DISPLAY_MODES: McpUiDisplayMode[] = ['inline', 'fullscreen', 'pip'];
+const AVAILABLE_DISPLAY_MODES: GooseDisplayMode[] = ['inline', 'fullscreen', 'pip', 'split-right'];
+const SPEC_DISPLAY_MODES: McpUiDisplayMode[] = ['inline', 'fullscreen', 'pip'];
+
+/** The SDK only accepts spec modes; Goose-only modes are reported to the app as 'pip'. */
+function toSpecDisplayMode(mode: GooseDisplayMode): McpUiDisplayMode {
+  return (SPEC_DISPLAY_MODES as string[]).includes(mode) ? (mode as McpUiDisplayMode) : 'pip';
+}
 
 interface UseDisplayModeOptions {
   displayMode: GooseDisplayMode;
@@ -23,14 +29,16 @@ interface UseDisplayModeOptions {
 
 export interface DisplayModeState {
   activeDisplayMode: GooseDisplayMode;
-  effectiveDisplayModes: McpUiDisplayMode[];
+  effectiveDisplayModes: GooseDisplayMode[];
   isStandalone: boolean;
   isFullscreen: boolean;
   isPip: boolean;
+  isSplitRight: boolean;
   isFillsViewport: boolean;
   isInline: boolean;
   appSupportsFullscreen: boolean;
   appSupportsPip: boolean;
+  appSupportsSplitRight: boolean;
   appTitle: string | null;
 
   changeDisplayMode: (mode: GooseDisplayMode) => void;
@@ -42,7 +50,7 @@ export interface DisplayModeState {
   fullscreenCloseRef: React.RefObject<HTMLButtonElement | null>;
 }
 
-export { AVAILABLE_DISPLAY_MODES };
+export { AVAILABLE_DISPLAY_MODES, SPEC_DISPLAY_MODES, toSpecDisplayMode };
 
 export function useDisplayMode({
   displayMode,
@@ -64,7 +72,7 @@ export function useDisplayMode({
   // App-declared title from ui/initialize (highest priority in the title fallback chain).
   const [appTitle, setAppTitle] = useState<string | null>(null);
 
-  const effectiveDisplayModes = useMemo((): McpUiDisplayMode[] => {
+  const effectiveDisplayModes = useMemo((): GooseDisplayMode[] => {
     if (!appDeclaredModes) return [];
     return AVAILABLE_DISPLAY_MODES.filter((m) => appDeclaredModes.includes(m));
   }, [appDeclaredModes]);
@@ -152,10 +160,17 @@ export function useDisplayMode({
   // Intercept app postMessages for:
   // 1. ui/initialize — extract appCapabilities.availableDisplayModes
   // 2. ui/request-display-mode — change display mode on behalf of the app
+  // Latest values are read through a ref so the listener is registered once, before the
+  // AppBridge transport's listener: same-target listeners fire in registration order,
+  // and the sanitising below must run before the bridge validates the message.
+  const latestRef = useRef({ changeDisplayMode, effectiveDisplayModes });
+  latestRef.current = { changeDisplayMode, effectiveDisplayModes };
+
   useEffect(() => {
     if (isStandalone) return;
 
     const handleMessage = (e: MessageEvent) => {
+      const { changeDisplayMode, effectiveDisplayModes } = latestRef.current;
       const data = e.data;
       if (!data || typeof data !== 'object') return;
       // eslint-disable-next-line no-undef
@@ -165,6 +180,11 @@ export function useDisplayMode({
         const caps = data.params.appCapabilities || data.params.capabilities;
         if (caps?.availableDisplayModes && Array.isArray(caps.availableDisplayModes)) {
           setAppDeclaredModes(caps.availableDisplayModes);
+          // The AppBridge schema rejects non-spec modes, so strip Goose-only modes
+          // before its listener validates this same message object.
+          caps.availableDisplayModes = caps.availableDisplayModes.filter((m: string) =>
+            (SPEC_DISPLAY_MODES as string[]).includes(m)
+          );
         }
         const title = data.params.clientInfo?.name;
         if (typeof title === 'string' && title.trim()) {
@@ -175,18 +195,19 @@ export function useDisplayMode({
       // After initialize, only allow modes both host and app agree on.
       // Before initialize (effectiveDisplayModes empty), fall back to the full host list.
       if (data.method === 'ui/request-display-mode' && data.params?.mode) {
-        const requested = data.params.mode as McpUiDisplayMode;
+        const requested = data.params.mode as GooseDisplayMode;
         const allowed =
           effectiveDisplayModes.length > 0 ? effectiveDisplayModes : AVAILABLE_DISPLAY_MODES;
         if (allowed.includes(requested)) {
           changeDisplayMode(requested);
         }
+        data.params.mode = toSpecDisplayMode(requested);
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [isStandalone, changeDisplayMode, effectiveDisplayModes]);
+  }, [isStandalone]);
 
   // Escape key exits fullscreen.
   useEffect(() => {
@@ -204,10 +225,12 @@ export function useDisplayMode({
   const isFullscreen = activeDisplayMode === 'fullscreen';
   const isPip = activeDisplayMode === 'pip';
   const isFillsViewport = isFullscreen || isStandalone;
-  const isInline = !isFillsViewport && !isPip;
+  const isSplitRight = activeDisplayMode === 'split-right';
+  const isInline = !isFillsViewport && !isPip && !isSplitRight;
 
   const appSupportsFullscreen = effectiveDisplayModes.includes('fullscreen');
   const appSupportsPip = effectiveDisplayModes.includes('pip');
+  const appSupportsSplitRight = effectiveDisplayModes.includes('split-right');
 
   return {
     activeDisplayMode,
@@ -215,10 +238,12 @@ export function useDisplayMode({
     isStandalone,
     isFullscreen,
     isPip,
+    isSplitRight,
     isFillsViewport,
     isInline,
     appSupportsFullscreen,
     appSupportsPip,
+    appSupportsSplitRight,
     appTitle,
 
     changeDisplayMode,

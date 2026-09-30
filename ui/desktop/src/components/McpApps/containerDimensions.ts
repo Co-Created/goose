@@ -6,6 +6,7 @@ export const DISPLAY_MODE_LAYOUTS: Record<GooseDisplayMode, DimensionLayout> = {
   fullscreen: { width: 'fixed', height: 'fixed' },
   standalone: { width: 'fixed', height: 'fixed' },
   pip: { width: 'fixed', height: 'flexible' },
+  'split-right': { width: 'fixed', height: 'fixed' },
 };
 
 export function getContainerDimensions(
