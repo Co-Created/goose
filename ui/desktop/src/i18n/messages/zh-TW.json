@@ -1974,19 +1974,19 @@
     "defaultMessage": "調整子母畫面視窗大小"
   },
   "mcpAppRenderer.backToInline": {
-    "defaultMessage": "返回對話"
+    "defaultMessage": "Back to conversation"
   },
   "mcpAppRenderer.openInSplitRight": {
-    "defaultMessage": "在側邊面板中開啟"
+    "defaultMessage": "Open in side panel"
   },
   "mcpAppRenderer.resizeSplitPanel": {
-    "defaultMessage": "調整側邊面板大小"
+    "defaultMessage": "Resize side panel"
   },
   "mcpAppRenderer.showInline": {
-    "defaultMessage": "在此顯示"
+    "defaultMessage": "Show here"
   },
   "mcpAppRenderer.showingInSplitRight": {
-    "defaultMessage": "正在側邊面板中顯示"
+    "defaultMessage": "Showing in side panel"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{找到 # 個項目} other{找到 # 個項目}}"

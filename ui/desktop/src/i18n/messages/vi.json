@@ -1974,19 +1974,19 @@
     "defaultMessage": "Thay đổi kích cỡ cửa sổ Hình-trong-hình"
   },
   "mcpAppRenderer.backToInline": {
-    "defaultMessage": "Quay lại cuộc trò chuyện"
+    "defaultMessage": "Back to conversation"
   },
   "mcpAppRenderer.openInSplitRight": {
-    "defaultMessage": "Mở trong bảng bên"
+    "defaultMessage": "Open in side panel"
   },
   "mcpAppRenderer.resizeSplitPanel": {
-    "defaultMessage": "Đổi kích thước bảng bên"
+    "defaultMessage": "Resize side panel"
   },
   "mcpAppRenderer.showInline": {
-    "defaultMessage": "Hiển thị tại đây"
+    "defaultMessage": "Show here"
   },
   "mcpAppRenderer.showingInSplitRight": {
-    "defaultMessage": "Đang hiển thị trong bảng bên"
+    "defaultMessage": "Showing in side panel"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# mục được tìm thấy} other{# mục được tìm thấy}}"

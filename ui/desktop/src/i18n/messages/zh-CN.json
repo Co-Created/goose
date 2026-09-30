@@ -1974,19 +1974,19 @@
     "defaultMessage": "调整画中画窗口大小"
   },
   "mcpAppRenderer.backToInline": {
-    "defaultMessage": "返回对话"
+    "defaultMessage": "Back to conversation"
   },
   "mcpAppRenderer.openInSplitRight": {
-    "defaultMessage": "在侧边栏中打开"
+    "defaultMessage": "Open in side panel"
   },
   "mcpAppRenderer.resizeSplitPanel": {
-    "defaultMessage": "调整侧边栏大小"
+    "defaultMessage": "Resize side panel"
   },
   "mcpAppRenderer.showInline": {
-    "defaultMessage": "在此显示"
+    "defaultMessage": "Show here"
   },
   "mcpAppRenderer.showingInSplitRight": {
-    "defaultMessage": "正在侧边栏中显示"
+    "defaultMessage": "Showing in side panel"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{找到 # 项} other{找到 # 项}}"

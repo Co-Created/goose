@@ -1974,19 +1974,19 @@
     "defaultMessage": "Resim İçinde Resim penceresini yeniden boyutlandırın"
   },
   "mcpAppRenderer.backToInline": {
-    "defaultMessage": "Sohbete dön"
+    "defaultMessage": "Back to conversation"
   },
   "mcpAppRenderer.openInSplitRight": {
-    "defaultMessage": "Yan panelde aç"
+    "defaultMessage": "Open in side panel"
   },
   "mcpAppRenderer.resizeSplitPanel": {
-    "defaultMessage": "Yan paneli yeniden boyutlandır"
+    "defaultMessage": "Resize side panel"
   },
   "mcpAppRenderer.showInline": {
-    "defaultMessage": "Burada göster"
+    "defaultMessage": "Show here"
   },
   "mcpAppRenderer.showingInSplitRight": {
-    "defaultMessage": "Yan panelde gösteriliyor"
+    "defaultMessage": "Showing in side panel"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# öğe bulundu} other{# öğe bulundu}}"

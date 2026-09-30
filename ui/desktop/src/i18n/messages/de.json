@@ -1974,19 +1974,19 @@
     "defaultMessage": "Bild-in-Bild-Fenster in der Größe ändern"
   },
   "mcpAppRenderer.backToInline": {
-    "defaultMessage": "Zurück zur Unterhaltung"
+    "defaultMessage": "Back to conversation"
   },
   "mcpAppRenderer.openInSplitRight": {
-    "defaultMessage": "In Seitenleiste öffnen"
+    "defaultMessage": "Open in side panel"
   },
   "mcpAppRenderer.resizeSplitPanel": {
-    "defaultMessage": "Seitenleiste in der Größe ändern"
+    "defaultMessage": "Resize side panel"
   },
   "mcpAppRenderer.showInline": {
-    "defaultMessage": "Hier anzeigen"
+    "defaultMessage": "Show here"
   },
   "mcpAppRenderer.showingInSplitRight": {
-    "defaultMessage": "Wird in der Seitenleiste angezeigt"
+    "defaultMessage": "Showing in side panel"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# Element gefunden} other{# Elemente gefunden}}"

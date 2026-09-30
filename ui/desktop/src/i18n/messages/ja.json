@@ -1974,19 +1974,19 @@
     "defaultMessage": "ピクチャ・イン・ピクチャウィンドウのサイズを変更"
   },
   "mcpAppRenderer.backToInline": {
-    "defaultMessage": "会話に戻る"
+    "defaultMessage": "Back to conversation"
   },
   "mcpAppRenderer.openInSplitRight": {
-    "defaultMessage": "サイドパネルで開く"
+    "defaultMessage": "Open in side panel"
   },
   "mcpAppRenderer.resizeSplitPanel": {
-    "defaultMessage": "サイドパネルのサイズを変更"
+    "defaultMessage": "Resize side panel"
   },
   "mcpAppRenderer.showInline": {
-    "defaultMessage": "ここに表示"
+    "defaultMessage": "Show here"
   },
   "mcpAppRenderer.showingInSplitRight": {
-    "defaultMessage": "サイドパネルに表示中"
+    "defaultMessage": "Showing in side panel"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# 件見つかりました} other{# 件見つかりました}}"
