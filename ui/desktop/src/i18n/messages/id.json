@@ -1973,6 +1973,21 @@
   "mcpAppRenderer.resizePipWindow": {
     "defaultMessage": "Ubah ukuran jendela Picture-in-Picture"
   },
+  "mcpAppRenderer.backToInline": {
+    "defaultMessage": "Kembali ke percakapan"
+  },
+  "mcpAppRenderer.openInSplitRight": {
+    "defaultMessage": "Buka di panel samping"
+  },
+  "mcpAppRenderer.resizeSplitPanel": {
+    "defaultMessage": "Ubah ukuran panel samping"
+  },
+  "mcpAppRenderer.showInline": {
+    "defaultMessage": "Tampilkan di sini"
+  },
+  "mcpAppRenderer.showingInSplitRight": {
+    "defaultMessage": "Ditampilkan di panel samping"
+  },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# item ditemukan} other{# item ditemukan}}"
   },

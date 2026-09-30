@@ -1973,6 +1973,21 @@
   "mcpAppRenderer.resizePipWindow": {
     "defaultMessage": "Redimensionner la fenêtre Picture-in-Picture"
   },
+  "mcpAppRenderer.backToInline": {
+    "defaultMessage": "Retour à la conversation"
+  },
+  "mcpAppRenderer.openInSplitRight": {
+    "defaultMessage": "Ouvrir dans le panneau latéral"
+  },
+  "mcpAppRenderer.resizeSplitPanel": {
+    "defaultMessage": "Redimensionner le panneau latéral"
+  },
+  "mcpAppRenderer.showInline": {
+    "defaultMessage": "Afficher ici"
+  },
+  "mcpAppRenderer.showingInSplitRight": {
+    "defaultMessage": "Affiché dans le panneau latéral"
+  },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# élément trouvé} other{# éléments trouvés}}"
   },

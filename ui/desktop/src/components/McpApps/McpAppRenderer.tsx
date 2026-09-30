@@ -12,6 +12,7 @@
  *
  * Display modes:
  * - "inline" | "fullscreen" | "pip" — standard MCP display modes
+ * - "split-right" — Goose-specific panel docked to the right of the conversation
  * - "standalone" — Goose-specific mode for dedicated Electron windows
  */
 
@@ -31,7 +32,7 @@ import type {
   McpUiSizeChangedNotification,
 } from '@modelcontextprotocol/ext-apps/app-bridge';
 import type { CallToolResult, JSONRPCRequest, Tool } from '@modelcontextprotocol/sdk/types.js';
-import { Maximize2, PictureInPicture2, X } from 'lucide-react';
+import { Maximize2, PanelRight, PictureInPicture2, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { callMcpAppTool, readMcpAppResource } from '../../acp/mcp-apps';
 import { httpBaseFromAcpWebSocketUrl, isLoopbackAcpWebSocketUrl } from '../../acp/url';
@@ -52,7 +53,7 @@ import {
   McpAppToolInputPartial,
   OnDisplayModeChange,
 } from './types';
-import { useDisplayMode, AVAILABLE_DISPLAY_MODES } from './useDisplayMode';
+import { useDisplayMode, SPEC_DISPLAY_MODES, toSpecDisplayMode } from './useDisplayMode';
 import {
   PIP_SHELL_CLASSES,
   PipPlaceholder,
@@ -61,6 +62,13 @@ import {
   pipPanelStyle,
   usePipWindow,
 } from './PipWindow';
+import {
+  SPLIT_RIGHT_SHELL_CLASSES,
+  SplitRightPanel,
+  SplitRightPlaceholder,
+  splitRightFrameStyle,
+  useSplitRightPanel,
+} from './SplitRightPanel';
 
 const i18n = defineMessages({
   appFallbackTitle: {
@@ -82,6 +90,10 @@ const i18n = defineMessages({
   fullscreen: {
     id: 'mcpAppRenderer.fullscreen',
     defaultMessage: 'Fullscreen',
+  },
+  openInSplitRight: {
+    id: 'mcpAppRenderer.openInSplitRight',
+    defaultMessage: 'Open in side panel',
   },
   invalidUrl: {
     id: 'mcpAppRenderer.invalidUrl',
@@ -533,10 +545,12 @@ export default function McpAppRenderer({
     isStandalone,
     isFullscreen,
     isPip,
+    isSplitRight,
     isFillsViewport,
     isInline,
     appSupportsFullscreen,
     appSupportsPip,
+    appSupportsSplitRight,
     appTitle,
     changeDisplayMode,
     inlineHeight,
@@ -544,6 +558,7 @@ export default function McpAppRenderer({
   } = dm;
 
   const pip = usePipWindow({ active: isPip, sessionId });
+  const split = useSplitRightPanel({ active: isSplitRight, anchorRef: containerRef });
 
   const { resolvedTheme, mcpHostStyles } = useTheme();
 
@@ -905,12 +920,17 @@ export default function McpAppRenderer({
       toolInfo: mcpTool ? { tool: mcpTool } : undefined,
       theme: resolvedTheme,
       styles: mcpHostStyles,
-      displayMode: activeDisplayMode as McpUiDisplayMode,
+      // Goose-only modes are sent as 'pip' in displayMode and left out of
+      // availableDisplayModes; the exact mode is in _meta.
+      displayMode: toSpecDisplayMode(activeDisplayMode),
       availableDisplayModes: isStandalone
         ? [activeDisplayMode as McpUiDisplayMode]
         : effectiveDisplayModes.length > 0
-          ? effectiveDisplayModes
-          : AVAILABLE_DISPLAY_MODES,
+          ? effectiveDisplayModes.filter((m): m is McpUiDisplayMode =>
+              (SPEC_DISPLAY_MODES as string[]).includes(m)
+            )
+          : SPEC_DISPLAY_MODES,
+      _meta: { 'goose/displayMode': activeDisplayMode },
       containerDimensions: getContainerDimensions(
         activeDisplayMode,
         containerWidth,
@@ -997,7 +1017,14 @@ export default function McpAppRenderer({
   };
 
   const showControls =
-    !isStandalone && !isError && (appSupportsFullscreen || appSupportsPip || isFullscreen || isPip);
+    !isStandalone &&
+    !isError &&
+    (appSupportsFullscreen ||
+      appSupportsPip ||
+      appSupportsSplitRight ||
+      isFullscreen ||
+      isPip ||
+      isSplitRight);
 
   const fullscreenTitle = useMemo(() => {
     if (appTitle) return appTitle;
@@ -1044,8 +1071,8 @@ export default function McpAppRenderer({
     // Fullscreen controls are rendered by renderFullscreenHeader instead.
     if (activeDisplayMode === 'fullscreen') return null;
 
-    // PiP controls are rendered by PipWindow instead.
-    if (activeDisplayMode === 'pip') return null;
+    // PiP and split-right controls are rendered by PipWindow and SplitRightPanel instead.
+    if (activeDisplayMode === 'pip' || activeDisplayMode === 'split-right') return null;
 
     // Inline mode — show controls on hover or keyboard focus
     return (
@@ -1070,6 +1097,16 @@ export default function McpAppRenderer({
             <PictureInPicture2 size={14} />
           </button>
         )}
+        {appSupportsSplitRight && (
+          <button
+            onClick={() => changeDisplayMode('split-right')}
+            className="cursor-pointer rounded-md bg-black/40 p-1.5 text-white backdrop-blur-sm transition-opacity hover:bg-black/60"
+            title={intl.formatMessage(i18n.openInSplitRight)}
+            aria-label={intl.formatMessage(i18n.openInSplitRight)}
+          >
+            <PanelRight size={14} />
+          </button>
+        )}
       </div>
     );
   };
@@ -1080,6 +1117,7 @@ export default function McpAppRenderer({
     'mcp-app-container bg-background-primary [&_iframe]:!w-full',
     isFillsViewport && 'fixed inset-0 z-[1000] overflow-hidden [&_iframe]:!h-full',
     isPip && PIP_SHELL_CLASSES.panel,
+    isSplitRight && SPLIT_RIGHT_SHELL_CLASSES.panel,
     isInline && 'group/mcp-app relative overflow-hidden',
     isInline && !isError && 'mt-6 mb-2',
     isInline && !isError && meta.prefersBorder && 'border border-border-primary rounded-lg',
@@ -1091,10 +1129,12 @@ export default function McpAppRenderer({
       ? {}
       : isPip
         ? pipPanelStyle(pip.geometry)
-        : {
-            width: '100%',
-            height: `${effectiveInlineHeight}px`,
-          }),
+        : isSplitRight
+          ? {}
+          : {
+              width: '100%',
+              height: `${effectiveInlineHeight}px`,
+            }),
   };
 
   return (
@@ -1109,17 +1149,42 @@ export default function McpAppRenderer({
       {isPip && (
         <PipPlaceholder height={inlineHeight} onReturn={() => changeDisplayMode('inline')} />
       )}
+      {isSplitRight && (
+        <SplitRightPlaceholder
+          title={fullscreenTitle}
+          onReturn={() => changeDisplayMode('inline')}
+        />
+      )}
 
       {/* Stable app shell — never unmounted, only restyled per mode, so the
           iframe keeps its state. Mode-specific chrome renders as siblings of
           the container inside this frame, never as its ancestors. */}
       <div
-        className={cn(isPip && PIP_SHELL_CLASSES.frame)}
-        style={isPip ? pipFrameStyle(pip.geometry) : undefined}
+        className={cn(
+          isPip && PIP_SHELL_CLASSES.frame,
+          isSplitRight && SPLIT_RIGHT_SHELL_CLASSES.frame
+        )}
+        style={
+          isPip
+            ? pipFrameStyle(pip.geometry)
+            : isSplitRight
+              ? splitRightFrameStyle(split.width, split.hostRect)
+              : undefined
+        }
       >
         {isPip && (
           <PipWindow
             {...pip}
+            title={fullscreenTitle}
+            onFullscreen={appSupportsFullscreen ? () => changeDisplayMode('fullscreen') : undefined}
+            onClose={() => changeDisplayMode('inline')}
+          />
+        )}
+        {isSplitRight && (
+          <SplitRightPanel
+            resizeHandlers={split.resizeHandlers}
+            width={split.width}
+            maxWidth={split.maxWidth}
             title={fullscreenTitle}
             onFullscreen={appSupportsFullscreen ? () => changeDisplayMode('fullscreen') : undefined}
             onClose={() => changeDisplayMode('inline')}

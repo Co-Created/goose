@@ -1973,6 +1973,21 @@
   "mcpAppRenderer.resizePipWindow": {
     "defaultMessage": "पिक्चर-इन-पिक्चर विंडो का आकार बदलें"
   },
+  "mcpAppRenderer.backToInline": {
+    "defaultMessage": "बातचीत पर वापस जाएँ"
+  },
+  "mcpAppRenderer.openInSplitRight": {
+    "defaultMessage": "साइड पैनल में खोलें"
+  },
+  "mcpAppRenderer.resizeSplitPanel": {
+    "defaultMessage": "साइड पैनल का आकार बदलें"
+  },
+  "mcpAppRenderer.showInline": {
+    "defaultMessage": "यहाँ दिखाएँ"
+  },
+  "mcpAppRenderer.showingInSplitRight": {
+    "defaultMessage": "साइड पैनल में दिखाया जा रहा है"
+  },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# आइटम मिला} other{# आइटम मिले}}"
   },

@@ -11,7 +11,10 @@ import type {
  */
 export type SandboxPermissions = string;
 
-export type GooseDisplayMode = McpUiDisplayMode | 'standalone';
+/** Display modes Goose adds beyond the MCP Apps spec (not accepted by the SDK's schemas). */
+export type GooseExtendedDisplayMode = 'split-right';
+
+export type GooseDisplayMode = McpUiDisplayMode | GooseExtendedDisplayMode | 'standalone';
 
 /**
  * Per the ext-apps spec, each axis is independently:

@@ -16,6 +16,10 @@ describe('getContainerDimensions', () => {
     expect(getContainerDimensions('pip', 398, 298)).toEqual({ width: 398, maxHeight: 298 });
   });
 
+  it('reports width and height for split-right because the panel fills its column', () => {
+    expect(getContainerDimensions('split-right', 480, 700)).toEqual({ width: 480, height: 700 });
+  });
+
   it('returns undefined until a fixed axis has been measured', () => {
     expect(getContainerDimensions('inline', 0, 200)).toBeUndefined();
     expect(getContainerDimensions('fullscreen', 1280, 0)).toBeUndefined();

@@ -1973,6 +1973,21 @@
   "mcpAppRenderer.resizePipWindow": {
     "defaultMessage": "ピクチャ・イン・ピクチャウィンドウのサイズを変更"
   },
+  "mcpAppRenderer.backToInline": {
+    "defaultMessage": "会話に戻る"
+  },
+  "mcpAppRenderer.openInSplitRight": {
+    "defaultMessage": "サイドパネルで開く"
+  },
+  "mcpAppRenderer.resizeSplitPanel": {
+    "defaultMessage": "サイドパネルのサイズを変更"
+  },
+  "mcpAppRenderer.showInline": {
+    "defaultMessage": "ここに表示"
+  },
+  "mcpAppRenderer.showingInSplitRight": {
+    "defaultMessage": "サイドパネルに表示中"
+  },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# 件見つかりました} other{# 件見つかりました}}"
   },

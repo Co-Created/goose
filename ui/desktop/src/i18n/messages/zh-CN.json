@@ -1973,6 +1973,21 @@
   "mcpAppRenderer.resizePipWindow": {
     "defaultMessage": "调整画中画窗口大小"
   },
+  "mcpAppRenderer.backToInline": {
+    "defaultMessage": "返回对话"
+  },
+  "mcpAppRenderer.openInSplitRight": {
+    "defaultMessage": "在侧边栏中打开"
+  },
+  "mcpAppRenderer.resizeSplitPanel": {
+    "defaultMessage": "调整侧边栏大小"
+  },
+  "mcpAppRenderer.showInline": {
+    "defaultMessage": "在此处显示"
+  },
+  "mcpAppRenderer.showingInSplitRight": {
+    "defaultMessage": "正在侧边栏中显示"
+  },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{找到 # 项} other{找到 # 项}}"
   },

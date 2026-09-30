@@ -1961,6 +1961,9 @@
   "mcpAppRenderer.appFallbackTitle": {
     "defaultMessage": "App"
   },
+  "mcpAppRenderer.backToInline": {
+    "defaultMessage": "Back to conversation"
+  },
   "mcpAppRenderer.close": {
     "defaultMessage": "Close"
   },
@@ -1985,6 +1988,9 @@
   "mcpAppRenderer.movePipWindow": {
     "defaultMessage": "Move Picture-in-Picture window"
   },
+  "mcpAppRenderer.openInSplitRight": {
+    "defaultMessage": "Open in side panel"
+  },
   "mcpAppRenderer.pictureInPicture": {
     "defaultMessage": "Picture-in-Picture"
   },
@@ -1993,6 +1999,15 @@
   },
   "mcpAppRenderer.resizePipWindow": {
     "defaultMessage": "Resize Picture-in-Picture window"
+  },
+  "mcpAppRenderer.resizeSplitPanel": {
+    "defaultMessage": "Resize side panel"
+  },
+  "mcpAppRenderer.showInline": {
+    "defaultMessage": "Show here"
+  },
+  "mcpAppRenderer.showingInSplitRight": {
+    "defaultMessage": "Showing in side panel"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# item found} other{# items found}}"
