@@ -50,9 +50,30 @@ export const SPLIT_RIGHT_HEADER_HEIGHT = 36;
 export const SPLIT_HOST_SELECTOR = '[data-mcp-split-host]';
 export const SPLIT_WIDTH_VARIABLE = '--mcp-split-right-width';
 
+export function splitRightMaxWidth(viewportWidth: number): number {
+  return Math.max(SPLIT_RIGHT_MIN_WIDTH, viewportWidth - SPLIT_RIGHT_MIN_CHAT_WIDTH);
+}
+
 export function clampSplitRightWidth(width: number, viewportWidth: number): number {
-  const max = Math.max(SPLIT_RIGHT_MIN_WIDTH, viewportWidth - SPLIT_RIGHT_MIN_CHAT_WIDTH);
+  const max = splitRightMaxWidth(viewportWidth);
   return Math.round(Math.max(SPLIT_RIGHT_MIN_WIDTH, Math.min(max, width)));
+}
+
+let warnedNoSplitHost = false;
+
+/**
+ * The host the panel docks to, or null when `el` has none. Without a host there is
+ * nowhere to reserve room, so callers stay inline instead of entering split-right.
+ */
+export function findSplitHost(el: Element | null | undefined): HTMLElement | null {
+  const host = el?.closest<HTMLElement>(SPLIT_HOST_SELECTOR) ?? null;
+  if (!host && el && !warnedNoSplitHost) {
+    warnedNoSplitHost = true;
+    console.warn(
+      `[McpAppRenderer] split-right needs a ${SPLIT_HOST_SELECTOR} ancestor; showing inline instead.`
+    );
+  }
+  return host;
 }
 
 export interface SplitHostRect {
@@ -81,6 +102,36 @@ export function clearSplitRightWidthStore() {
   rememberedWidth = null;
 }
 
+// Host reservations
+
+/** Width reserved by each docked panel, per host, so closing one keeps the others' room. */
+const hostReservations = new WeakMap<HTMLElement, Map<object, number>>();
+
+function applyHostReservation(host: HTMLElement) {
+  const widths = hostReservations.get(host);
+  if (!widths || widths.size === 0) {
+    host.style.removeProperty(SPLIT_WIDTH_VARIABLE);
+    return;
+  }
+  host.style.setProperty(SPLIT_WIDTH_VARIABLE, `${Array.from(widths.values()).pop()}px`);
+}
+
+function reserveHostWidth(host: HTMLElement, owner: object, width: number) {
+  let widths = hostReservations.get(host);
+  if (!widths) {
+    widths = new Map();
+    hostReservations.set(host, widths);
+  }
+  widths.delete(owner);
+  widths.set(owner, width);
+  applyHostReservation(host);
+}
+
+function releaseHostWidth(host: HTMLElement, owner: object) {
+  hostReservations.get(host)?.delete(owner);
+  applyHostReservation(host);
+}
+
 // Hook
 
 export interface SplitResizeHandlers {
@@ -93,6 +144,7 @@ export interface SplitResizeHandlers {
 
 export interface SplitRightPanelState {
   width: number;
+  maxWidth: number;
   /** Bounds of the host the panel docks to; null until measured. */
   hostRect: SplitHostRect | null;
   resizeHandlers: SplitResizeHandlers;
@@ -113,24 +165,28 @@ export function useSplitRightPanel({
   const widthRef = useRef(width);
   const [hostRect, setHostRect] = useState<SplitHostRect | null>(null);
 
-  const setWidth = useCallback((next: number) => {
+  const setWidth = useCallback((next: number, remember: boolean) => {
     const clamped = clampSplitRightWidth(next, window.innerWidth);
     widthRef.current = clamped;
-    saveSplitRightWidth(clamped);
+    if (remember) saveSplitRightWidth(clamped);
     setWidthState(clamped);
   }, []);
 
-  // Entering split-right restores the remembered width, re-clamped to the current window.
+  // Entering split-right, or resizing the window, shows the remembered width
+  // re-clamped to the current window without changing what is remembered.
   useEffect(() => {
     if (!active) return;
-    setWidth(loadSplitRightWidth(window.innerWidth));
+    const restore = () => setWidth(loadSplitRightWidth(window.innerWidth), false);
+    restore();
+    window.addEventListener('resize', restore);
+    return () => window.removeEventListener('resize', restore);
   }, [active, setWidth]);
 
   // Track the host's bounds so the panel stays aligned with it.
   const [host, setHost] = useState<HTMLElement | null>(null);
   useEffect(() => {
     if (!active) return;
-    const el = anchorRef.current?.closest<HTMLElement>(SPLIT_HOST_SELECTOR) ?? null;
+    const el = findSplitHost(anchorRef.current);
     setHost(el);
     if (!el) return;
     const measure = () => {
@@ -149,20 +205,17 @@ export function useSplitRightPanel({
   }, [active, anchorRef]);
 
   // Reserve room in the host so the conversation reflows beside the panel.
+  const [owner] = useState(() => ({}));
   useEffect(() => {
     if (!active || !host) return;
-    host.style.setProperty(SPLIT_WIDTH_VARIABLE, `${width}px`);
-    return () => {
-      host.style.removeProperty(SPLIT_WIDTH_VARIABLE);
-    };
-  }, [active, host, width]);
+    reserveHostWidth(host, owner, widthRef.current);
+    return () => releaseHostWidth(host, owner);
+  }, [active, host, owner]);
 
   useEffect(() => {
-    if (!active) return;
-    const handleResize = () => setWidth(widthRef.current);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [active, setWidth]);
+    if (!active || !host) return;
+    reserveHostWidth(host, owner, width);
+  }, [active, host, owner, width]);
 
   const resizeHandlers = useMemo((): SplitResizeHandlers => {
     let drag: { startX: number; originWidth: number } | null = null;
@@ -175,7 +228,7 @@ export function useSplitRightPanel({
       onPointerMove: (e) => {
         if (!drag) return;
         // The handle sits on the panel's left edge: dragging left widens the panel.
-        setWidth(drag.originWidth + drag.startX - e.clientX);
+        setWidth(drag.originWidth + drag.startX - e.clientX, true);
       },
       onPointerUp: (e) => {
         (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
@@ -186,15 +239,17 @@ export function useSplitRightPanel({
       },
       onKeyDown: (e) => {
         const step = e.shiftKey ? 64 : 16;
-        if (e.key === 'ArrowLeft') setWidth(widthRef.current + step);
-        else if (e.key === 'ArrowRight') setWidth(widthRef.current - step);
+        if (e.key === 'ArrowLeft') setWidth(widthRef.current + step, true);
+        else if (e.key === 'ArrowRight') setWidth(widthRef.current - step, true);
+        else if (e.key === 'Home') setWidth(SPLIT_RIGHT_MIN_WIDTH, true);
+        else if (e.key === 'End') setWidth(splitRightMaxWidth(window.innerWidth), true);
         else return;
         e.preventDefault();
       },
     };
   }, [setWidth]);
 
-  return { width, hostRect, resizeHandlers };
+  return { width, maxWidth: splitRightMaxWidth(window.innerWidth), hostRect, resizeHandlers };
 }
 
 // Shell styling
@@ -224,6 +279,8 @@ export function splitRightFrameStyle(
 
 interface SplitRightPanelProps {
   resizeHandlers: SplitResizeHandlers;
+  width: number;
+  maxWidth: number;
   title: string;
   /** Omitted when the app does not support fullscreen. */
   onFullscreen?: () => void;
@@ -236,6 +293,8 @@ interface SplitRightPanelProps {
  */
 export function SplitRightPanel({
   resizeHandlers,
+  width,
+  maxWidth,
   title,
   onFullscreen,
   onClose,
@@ -249,7 +308,10 @@ export function SplitRightPanel({
         aria-orientation="vertical"
         tabIndex={0}
         aria-label={intl.formatMessage(i18n.resizeSplitPanel)}
-        aria-keyshortcuts="ArrowLeft ArrowRight"
+        aria-keyshortcuts="ArrowLeft ArrowRight Home End"
+        aria-valuenow={width}
+        aria-valuemin={SPLIT_RIGHT_MIN_WIDTH}
+        aria-valuemax={maxWidth}
         className="absolute inset-y-0 left-0 z-30 flex w-2 cursor-col-resize items-center justify-center text-text-secondary opacity-60 outline-none hover:bg-black/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-active dark:hover:bg-white/10"
         onPointerDown={resizeHandlers.onPointerDown}
         onPointerMove={resizeHandlers.onPointerMove}

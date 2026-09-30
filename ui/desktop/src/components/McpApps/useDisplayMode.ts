@@ -8,7 +8,8 @@
  */
 
 import type { McpUiDisplayMode } from '@modelcontextprotocol/ext-apps/app-bridge';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { findSplitHost } from './SplitRightPanel';
 import type { GooseDisplayMode, OnDisplayModeChange } from './types';
 
 const DEFAULT_IFRAME_HEIGHT = 200;
@@ -59,8 +60,16 @@ export function useDisplayMode({
 }: UseDisplayModeOptions): DisplayModeState {
   const [activeDisplayMode, setActiveDisplayMode] = useState<GooseDisplayMode>(displayMode);
 
-  useEffect(() => {
+  // A split-right mode set through the prop falls back to inline when there is no
+  // host to dock to. Layout effects run before paint so the undocked panel never shows.
+  useLayoutEffect(() => {
+    if (displayMode === 'split-right' && !findSplitHost(containerRef.current)) {
+      setActiveDisplayMode('inline');
+      onDisplayModeChange?.('inline');
+      return;
+    }
     setActiveDisplayMode(displayMode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayMode]);
 
   const isStandalone = displayMode === 'standalone';
@@ -94,6 +103,7 @@ export function useDisplayMode({
   const changeDisplayMode = useCallback(
     (mode: GooseDisplayMode) => {
       const el = containerRef.current;
+      if (mode === 'split-right' && !findSplitHost(el)) return;
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       if (activeDisplayMode === 'inline' && el) {
@@ -108,7 +118,8 @@ export function useDisplayMode({
       setActiveDisplayMode(mode);
       onDisplayModeChange?.(mode);
 
-      if (el && !prefersReducedMotion && mode !== activeDisplayMode) {
+      // Split-right has no entrance animation.
+      if (el && !prefersReducedMotion && mode !== activeDisplayMode && mode !== 'split-right') {
         const animClass =
           mode === 'pip'
             ? 'mcp-enter-pip'

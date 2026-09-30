@@ -920,12 +920,15 @@ export default function McpAppRenderer({
       toolInfo: mcpTool ? { tool: mcpTool } : undefined,
       theme: resolvedTheme,
       styles: mcpHostStyles,
-      // Goose-only modes are sent as 'pip' in spec fields; the exact mode is in _meta.
+      // Goose-only modes are sent as 'pip' in displayMode and left out of
+      // availableDisplayModes; the exact mode is in _meta.
       displayMode: toSpecDisplayMode(activeDisplayMode),
       availableDisplayModes: isStandalone
         ? [activeDisplayMode as McpUiDisplayMode]
         : effectiveDisplayModes.length > 0
-          ? Array.from(new Set(effectiveDisplayModes.map(toSpecDisplayMode)))
+          ? effectiveDisplayModes.filter((m): m is McpUiDisplayMode =>
+              (SPEC_DISPLAY_MODES as string[]).includes(m)
+            )
           : SPEC_DISPLAY_MODES,
       _meta: { 'goose/displayMode': activeDisplayMode },
       containerDimensions: getContainerDimensions(
@@ -1180,6 +1183,8 @@ export default function McpAppRenderer({
         {isSplitRight && (
           <SplitRightPanel
             resizeHandlers={split.resizeHandlers}
+            width={split.width}
+            maxWidth={split.maxWidth}
             title={fullscreenTitle}
             onFullscreen={appSupportsFullscreen ? () => changeDisplayMode('fullscreen') : undefined}
             onClose={() => changeDisplayMode('inline')}
